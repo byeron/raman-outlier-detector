@@ -18,7 +18,8 @@ def is_in_sigma(value, mean, std, sigma):
 @click.option("--col", "-c", multiple=True, type=str, default=[])
 @click.option("--sigma", "-s", type=float, default=1.0)
 @click.option("--robust", "-rb", is_flag=True, default=False)
-def run(path, row, col, sigma, robust):
+@click.option("--threshold", "-t", type=float, default=0.5)
+def run(path, row, col, sigma, robust, threshold):
     df = pd.read_csv(path, index_col=0, header=0)
     if row:
         df = df.loc[row, :]
@@ -39,7 +40,6 @@ def run(path, row, col, sigma, robust):
         mean = df.mean(axis=0)
         std = df.std(axis=0)
 
-    right_rate = len(df.columns) / 2
     for group, data in df.groupby(level=0):
         click.echo(f"Group: {group}'s Outlier")
         outlier_samples = 0
@@ -49,8 +49,9 @@ def run(path, row, col, sigma, robust):
                 if not is_in_sigma(value, mean[colname], std[colname], sigma):
                     counter += 1
 
-            # 着目している行について、半数以上の列が指定したsigmaの範囲内にある場合はOK
-            if counter >= right_rate:
+            # if the number of outliers is greater than the threshold, print the sample id
+            error_rate = counter / len(data.columns)
+            if error_rate >= threshold:
                 click.echo(f"Sample ID:\t{i}")
                 outlier_samples += 1
         outlier_samples_rate = outlier_samples / len(data)
