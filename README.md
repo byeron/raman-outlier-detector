@@ -8,3 +8,7 @@ poetry run python main.py run data/testdata.csv --sigma 2.0 --row A --column col
 
 これで、testdata.csvのA行のcol_1, col_2のデータに対して、外れ値を持つサンプル番号が表示される
 
+```bash
+poetry run python main.py testdata
+```
+これで、動作確認用のランダムなデータが生成される
