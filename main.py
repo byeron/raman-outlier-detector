@@ -16,10 +16,13 @@ def is_in_sigma(value, mean, std, sigma):
 @click.argument("path", type=click.Path(exists=True))
 @click.option("--row", "-r", multiple=True, type=str, default=[])
 @click.option("--col", "-c", multiple=True, type=str, default=[])
-@click.option("--sigma", "-s", type=float, default=1.0)
-@click.option("--robust", "-rb", is_flag=True, default=False)
-@click.option("--threshold", "-t", type=float, default=0.5)
+@click.option("--sigma", "-s", type=float, default=1.0, show_default=True)
+@click.option("--robust", "-rb", is_flag=True, default=False, show_default=True)
+@click.option("--threshold", "-t", type=float, default=0.5, help="Threshold for outlier sample rate", show_default=True)
 def run(path, row, col, sigma, robust, threshold):
+    if len(set(col)) != len(col):
+        click.echo("Error: Duplicate column names")
+
     df = pd.read_csv(path, index_col=0, header=0)
     if row:
         df = df.loc[row, :]
